@@ -64,7 +64,7 @@ class BookListViewController: ViewController {
         bookListTableView.dataSource = self
         bookListTableView.delegate = self
         bookListTableView.register(BookListTableViewCell.self, forCellReuseIdentifier: BookListTableViewCell.identifier3)
-        deleteallButton.addTarget(self, action: #selector(deletAll), for: .touchUpInside)
+        deleteallButton.addTarget(self, action: #selector(deleteAll), for: .touchUpInside)
     }
 }
 //MARK: - 테이블뷰
@@ -85,7 +85,7 @@ extension BookListViewController: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
 }
-//MARK: - 코어데이터에서 Read부분
+//MARK: - 코어데이터에서 Read,Delete
 extension BookListViewController {
     
     func bookSearchfetch() {
@@ -104,9 +104,22 @@ extension BookListViewController {
         }
     }
     
-    //버튼눌리면 코어데이터 삭제하기 구현해야함
-        @objc func deletAll(sender: UIButton) {
-        
+    //버튼눌리면 코어데이터 삭제하기
+        @objc func deleteAll(sender: UIButton) {
+            let context = ContainerManager.shared.persistentContainer.viewContext
+            let delete = NSFetchRequest<NSFetchRequestResult>(entityName: "BookSearchList")
+            let deleteRequest = NSBatchDeleteRequest(fetchRequest: delete)
+            do {
+                try context.execute(deleteRequest)
+                selectList.removeAll()
+                reloadTableView()
+                print("All Delete")
+            } catch {
+                print("Delete Error")
+            }
+            let alert = UIAlertController(title: "책 담은것을 전부 삭제했습니다", message: nil, preferredStyle: .alert)
+            let cancel = UIAlertAction(title: "확인", style: .default)
+            alert.addAction(cancel)
+            present(alert, animated: true)
         }
-        
 }
