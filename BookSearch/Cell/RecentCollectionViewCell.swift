@@ -12,16 +12,17 @@ class RecentCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         
         self.addSubview(recentImage)
-        recentImage.backgroundColor = .white
-        recentImage.snp.makeConstraints {
-            $0.width.equalTo(100)
-            $0.height.equalTo(120)
-        }
+        recentImage.backgroundColor = .lightGray
         recentImage.layer.cornerRadius = 20
+        recentImage.clipsToBounds = true
+        recentImage.snp.makeConstraints {
+            $0.centerX.centerY.equalToSuperview()
+            $0.width.equalTo(90)
+            $0.height.equalTo(110)
+        }
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
 }

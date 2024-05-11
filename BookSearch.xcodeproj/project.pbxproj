@@ -125,13 +125,13 @@
 				39C19F5B2BE4F280001D7D27 /* ViewController.swift */,
 				39C19F592BE4F280001D7D27 /* SceneDelegate.swift */,
 				39C19F572BE4F280001D7D27 /* AppDelegate.swift */,
+				39C36E122BEE061400C88A42 /* APIKey.swift */,
 				39C19F5D2BE4F280001D7D27 /* Main.storyboard */,
 				39C19F632BE4F282001D7D27 /* Assets.xcassets */,
 				39C19F652BE4F282001D7D27 /* LaunchScreen.storyboard */,
 				39C19F682BE4F282001D7D27 /* Info.plist */,
 				39C19F602BE4F280001D7D27 /* BookSearch.xcdatamodeld */,
 				39C36E102BEE05E900C88A42 /* .gitignore */,
-				39C36E122BEE061400C88A42 /* APIKey.swift */,
 			);
 			path = BookSearch;
 			sourceTree = "<group>";

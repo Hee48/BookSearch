@@ -5,8 +5,12 @@ import SnapKit
 
 class SearchViewController: ViewController {
     
-  //Model부분을 book에 넣기 bookModel로 접근하지말고 Document로 바로접근가능
+    //Model부분을 book에 넣기 bookModel로 접근하지말고 Document로 바로접근가능
     var bookData: [Document] = []
+    //테이블뷰에 didSelectRowAt에서 선택된 정보를 컬렉션뷰에 전달용
+    var recentBook: [Document] = []
+    //최근본책에서 같은 책 안겹치게 하기위한 set
+    var sameThumbnail: Set<String> = []
     
     let searchBar = UISearchBar()
     let searchTableView = UITableView()
@@ -94,8 +98,28 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     }
     //테이블뷰 셀누르면 화면전환
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //이동도 뷰컨트롤러를 생성해야함
+        //selectedBook은 디코딩한 데이터를 가지고있음
         let selectedBook = bookData[indexPath.row]
+        //sameThumbnail의 set에 선택한 책의 썸네일이 포함contains 되어있는지 확인
+        //selectedBook에 thumbnail이 sameThumbnail 존재하지 않는지 확인하는것
+        if !sameThumbnail.contains(selectedBook.thumbnail) {
+        //선택한 썸네일이 아직 sameThumbnail에 없으면 insert 0번째 삽입하는것 이부분이 가장최근에 선택한책이 첫번째 표시되게함
+              recentBook.insert(selectedBook, at: 0)
+            //선택한 책의 썸네일이 sameThumbnail에 없다면 set에 섬네일을 삽입 하기
+            sameThumbnail.insert(selectedBook.thumbnail)
+              //recentBook에 10개보다 많으면
+              if recentBook.count > 10 {
+                  //마지막 책이미지를 제외하기
+                  recentBook.removeLast()
+                  //recentBook의 배열에서 마지막 책의 썸네일을 가져오기
+                  if let lastThumbnail = recentBook.last?.thumbnail {
+                      //마지막책의 썸네일을 가져오면 세트에서 이를 제거하는부분
+                      sameThumbnail.remove(lastThumbnail)
+                  }
+              }
+              searchCollectionView.reloadData()
+          }
+        //이동도 뷰컨트롤러를 생성해야함
         let bookDetailsVC = BookDetailsViewController()
         //선택된 해당하는 데이터 넘겨주기
         bookDetailsVC.selectedBook = selectedBook
@@ -106,10 +130,13 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
 extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
+        return recentBook.count
     }
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = searchCollectionView.dequeueReusableCell(withReuseIdentifier: "RecentCell", for: indexPath) as! RecentCollectionViewCell
+        let recentBook = recentBook[indexPath.item]
+        let url = URL(string: recentBook.thumbnail)
+            cell.recentImage.kf.setImage(with: url)
         return cell
     }
    //컬렉션뷰 셀사이즈 지정하는부분
@@ -163,7 +190,7 @@ extension SearchViewController {
             }
             guard let data = data else { return }
 //            print(String(data: data, encoding: .utf8))
-            //BookModel으로 매핑되는지 확인되는부분(디코딩)
+            //BookModel으로 매칭되는지 확인되는부분(디코딩)
             guard let bookdata = try? JSONDecoder().decode(BookModel.self, from: data) else {
                 print("디코딩실패했다!!!!")
                 return
@@ -172,6 +199,7 @@ extension SearchViewController {
             self.bookData = bookdata.documents
             DispatchQueue.main.async {
                 self.searchTableView.reloadData()
+                self.searchCollectionView.reloadData()
             }
         }
        task.resume()
